@@ -36,15 +36,14 @@ class MiniScreenInit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final built = builder?.call(context, child) ?? child;
-
     return LayoutBuilder(
       builder: (context, constraints) {
-        final mq = MediaQuery.of(context);
+        final screenSize = MediaQuery.sizeOf(context);
+        final textScaler = MediaQuery.textScalerOf(context);
 
         MiniScreenUtil.init(
-          screenSize: Size(constraints.maxWidth, constraints.maxHeight),
-          systemTextScaleFactor: mq.textScaleFactor,
+          screenSize: screenSize,
+          systemTextScaler: textScaler,
           config: MiniScreenConfig(
             designSize: designSize,
             allowSystemTextScale: allowSystemTextScale,
@@ -53,7 +52,15 @@ class MiniScreenInit extends StatelessWidget {
           ),
         );
 
-        return built;
+        final built = builder?.call(context, child) ?? child;
+
+        // Force subtree rebuild on resize/orientation changes (especially important on Web),
+        // so widgets that rely on .w/.h/.sp/.r (and don't read MediaQuery directly) update.
+        return KeyedSubtree(
+          key: ValueKey(
+              'msu_${screenSize.width}x${screenSize.height}_${textScaler.scale(1.0)}'),
+          child: built,
+        );
       },
     );
   }

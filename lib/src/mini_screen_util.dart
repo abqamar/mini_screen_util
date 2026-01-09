@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/widgets.dart';
 
 import 'config.dart';
 import 'enums.dart';
@@ -11,7 +11,7 @@ class MiniScreenUtil {
   MiniScreenUtil._();
 
   static late Size _screen;
-  static late double _systemTextScale;
+  static late TextScaler _systemTextScaler;
   static late MiniScreenConfig _config;
   static bool _ready = false;
 
@@ -20,11 +20,11 @@ class MiniScreenUtil {
   /// Usually you do not call this directly; wrap your app with [MiniScreenInit].
   static void init({
     required Size screenSize,
-    required double systemTextScaleFactor,
+    required TextScaler systemTextScaler,
     required MiniScreenConfig config,
   }) {
     _screen = screenSize;
-    _systemTextScale = systemTextScaleFactor;
+    _systemTextScaler = systemTextScaler;
     _config = config;
     _ready = true;
   }
@@ -61,16 +61,29 @@ class MiniScreenUtil {
   }
 
   /// Effective text scale factor used for `.sp`.
-  static double get textScale {
+  static double get textScaleFactor {
     _checkReady();
     if (!_config.allowSystemTextScale) return 1.0;
 
+    // Flutter now exposes a TextScaler instead of a single textScaleFactor.
+    // We derive an approximate factor by scaling 1.0.
+    var factor = _systemTextScaler.scale(1.0);
+
     final min = _config.minTextScaleFactor;
     final max = _config.maxTextScaleFactor;
-    var v = _systemTextScale;
-    if (min != null && v < min) v = min;
-    if (max != null && v > max) v = max;
-    return v;
+    if (min != null && factor < min) factor = min;
+    if (max != null && factor > max) factor = max;
+
+    return factor;
+  }
+
+  static TextScaler get textScaler {
+    _checkReady();
+    if (!_config.allowSystemTextScale) return const TextScaler.linear(1.0);
+
+    final factor = textScaleFactor;
+    // We intentionally use a linear scaler after clamping to ensure predictable results.
+    return TextScaler.linear(factor);
   }
 
   /// Scale a value based on width.
@@ -105,6 +118,7 @@ class MiniScreenUtil {
   /// Uses width scaling and applies system text scale (optional).
   static double sp(num v) {
     _checkReady();
-    return v * scaleW * textScale;
+    final base = v * scaleW;
+    return textScaler.scale(base);
   }
 }

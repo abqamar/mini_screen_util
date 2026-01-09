@@ -1,12 +1,10 @@
 name: mini_screen_util
 description: A tiny ScreenUtil-like helper built on MediaQuery that provides .w/.h/.r/.sp without passing BuildContext.
-version: 0.0.1
-homepage: https://github.com/abqamar/mini_screen_util.git
-license: MIT
+version: 0.0.2
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  flutter: ">=3.16.0"
 
 dependencies:
   flutter:

@@ -7,15 +7,16 @@ A tiny ScreenUtil-like helper built on **MediaQuery**.
 - ✅ Handles resize/orientation (via `LayoutBuilder`)
 - ✅ Optional system text scale support + clamp
 
-> Version: **0.0.1**
+> Version: **0.0.2**
 
----
+[![pub package](https://img.shields.io/pub/v/mini_screen_util.svg)](https://pub.dev/packages/mini_screen_util)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Install
 
 ```yaml
 dependencies:
-  mini_screen_util: ^0.0.1
+  mini_screen_util: ^0.0.2
 ```
 
 ---
@@ -77,7 +78,7 @@ class DemoCard extends StatelessWidget {
 
 ## Notes
 
-- `.sp` uses **width scaling** + optional **system textScaleFactor**.
+- `.sp` uses **width scaling** + optional **system textScaler**.
 - `.r` defaults to scaling using the **shortest side**.
 
 ---
@@ -85,3 +86,8 @@ class DemoCard extends StatelessWidget {
 ## License
 
 MIT
+
+
+## Text scaling (Flutter TextScaler)
+
+Flutter has deprecated `textScaleFactor` in favor of `TextScaler`. `mini_screen_util` uses `MediaQuery.textScalerOf(context)` under the hood and applies it in `.sp`.
